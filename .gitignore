@@ -1,0 +1,19 @@
+# Node modules
+node_modules/
+
+# Build output (if you don't want to commit the compiled code)
+# dist/
+
+# Demo application (if you prefer not to include it)
+demo/
+
+# TypeScript cache and logs
+*.tsbuildinfo
+*.log
+
+# Editor files
+.vscode/
+.idea/
+
+# Environment files
+.env
