@@ -309,6 +309,7 @@ ForgeForm provides a rich set of pre-built regex validators to streamline your f
 
 Here's a table summarizing the available validators and their common use cases:
 
+
 ### Common Data Formats
 
 | Validator Name | Description                                          | Use Cases                                                                 |
@@ -317,7 +318,9 @@ Here's a table summarizing the available validators and their common use cases:
 | `phone`          | Validates phone numbers (international format).      | Phone number fields in user profiles, contact information.                |
 | `url`            | Validates URLs (HTTP, HTTPS, FTP).                 | Website fields, profile URLs, links in content.                              |
 | `uuid`           | Validates UUIDs (versions 1-5).                    | Unique identifiers, API keys, database record IDs.                         |
-| `zip`            | Validates US ZIP codes (5 or 9 digits).             | Address forms for US users, shipping address validation.                   |
+| `zip`            | Validates US ZIP codes (5 or 9 digits) & Indian ZIP codes (6 digits). | Address forms for US and Indian users, shipping address validation.                   |
+| `indianZipCode6Digit` | Validates Indian ZIP codes (strict 6 digits).      | Forms specifically requiring 6-digit Indian ZIP codes.                     |
+| `indianZipCode6DigitFlexible` | Validates Indian ZIP codes (6 digits, allows spaces/hyphens). | More flexible input for Indian ZIP codes, accommodating common separators.      |
 | `ip`             | Validates IPv4 addresses.                           | Server address inputs, network configurations.                             |
 | `date`           | Validates dates in YYYY-MM-DD format.             | Date of birth, event dates, booking dates.                                  |
 | `time`           | Validates times in HH:MM or HH:MM:SS format.      | Appointment times, scheduling forms.                                       |
@@ -325,6 +328,10 @@ Here's a table summarizing the available validators and their common use cases:
 | `hexColor`       | Validates hexadecimal color codes.                 | Color picker inputs, theme customization forms.                            |
 | `rgb`            | Validates `rgb(r, g, b)` color format.             | Color settings, visual customization.                                      |
 | `aadhar`         | Validates Indian Aadhar card numbers (12 digits).  | Forms requiring Indian national ID verification (within India, respecting privacy regulations). |
+| `panCard`        | Validates Indian PAN card numbers.                 | Financial forms, Indian tax compliance forms.                             |
+| `indianDrivingLicense`| Validates Indian driving license numbers (basic format). | Indian address verification, KYC forms.                             |
+| `gstNumber`      | Validates Indian GST numbers.                       | Indian business forms, tax related forms.                                  |
+| `indianPassport`   | Validates Indian passport numbers (basic format).    | Indian identity verification, travel related forms.                        |
 
 
 ### String Patterns
@@ -351,6 +358,68 @@ Here's a table summarizing the available validators and their common use cases:
 | `macAddress`      | MAC addresses.                                     | Network device identification, hardware settings.               |
 | `jwt`             | JSON Web Tokens (basic structure).                | API authentication, token validation (structural).              |
 | `semver`          | Semantic Versioning strings.                      | Software version input, package management forms.                 |
+| `vin`             | Vehicle Identification Number (VIN).              | Vehicle registration forms, automotive data input.              |
+| `usCurrency`      | US currency format.                               | Financial applications, e-commerce platforms.                   |
+| `signedPercentage`| Percentages with optional +/- sign.               | Financial reports, performance metrics.                         |
+| `visaCard`        | Visa credit card numbers.                           | Payment forms, specific card type validation.                  |
+| `masterCard`      | MasterCard credit card numbers.                     | Payment forms, specific card type validation.                  |
+| `amexCard`        | American Express credit card numbers.               | Payment forms, specific card type validation.                  |
+| `discoverCard`    | Discover credit card numbers.                       | Payment forms, specific card type validation.                  |
+| `dinersClubCard`  | Diners Club credit card numbers.                    | Payment forms, specific card type validation.                  |
+| `jcbCard`         | JCB credit card numbers.                            | Payment forms, specific card type validation.                  |
+| `genericPhoneNumber`| Generic phone numbers with extensions.            | Flexible phone number input fields.                             |
+| `ssnFlexible`     | US Social Security Numbers (flexible formats).    | More lenient SSN input, data cleaning.                          |
+| `usPhoneNumber`   | US phone numbers with area code format.           | US-specific phone number fields.                                |
+| `time12h`         | Time in 12-hour format (with AM/PM).              | User-friendly time input, appointment scheduling.                |
+| `simpleURL`       | Simple URLs without protocol (domain.tld).         | Quick URL input, less strict URL validation.                   |
+| `youtubeURL`      | YouTube video URLs.                                 | Embedding videos, content curation.                             |
+| `vimeoURL`        | Vimeo video URLs.                                  | Embedding videos, content curation.                             |
+| `dateSlashMDY`    | Dates in MM/DD/YYYY format.                         | US-style date input.                                            |
+| `dateDotDMY`      | Dates in DD.MM.YYYY format.                         | European-style date input.                                      |
+| `timeFlexibleMilliseconds` | Time with milliseconds (flexible).         | Time logging, detailed time input.                             |
+| `versionNumber`   | Flexible version numbers.                           | Software version management, application settings.              |
+| `orderId`         | Order ID format (example).                          | E-commerce, order tracking systems.                             |
+| `productCode`     | Product code format (example).                      | Inventory systems, product databases.                           |
+| `trackingNumber`  | Tracking number format (generic).                   | Shipping and logistics forms.                                   |
+| `invoiceNumber`   | Invoice number format (example).                    | Accounting, billing systems.                                     |
+| `eventId`         | Event ID format (example).                           | Event management systems, ticketing.                             |
+| `jobId`           | Job ID format (example).                             | Task management, job tracking applications.                     |
+| `serialNumber`    | Serial number format (example).                      | Equipment tracking, warranty systems.                           |
+| `modelNumber`     | Model number format (example).                       | Product catalogs, technical specifications.                       |
+| `sku`             | SKU (Stock Keeping Unit) format (example).         | Inventory management, retail systems.                           |
+| `assetTag`        | Asset tag format (example).                          | Asset tracking, inventory management.                           |
+| `receiptNumber`   | Receipt number format (example).                     | Point of sale systems, transaction records.                     |
+| `confirmationNumber`| Confirmation number format (example).              | Booking systems, registration confirmations.                    |
+| `bookingReference`| Booking reference format (example).                | Travel booking, appointment systems.                            |
+| `ticketNumber`    | Ticket number format (example).                      | Support systems, event ticketing.                                |
+| `referenceCode`   | Generic reference code format.                       | General purpose identification codes.                           |
+| `voucherCode`     | Voucher code format (example).                       | Marketing promotions, discount systems.                         |
+| `couponCode`      | Coupon code format (example).                        | E-commerce discounts, promotional offers.                        |
+| `promotionCode`   | Promotion code format (example).                     | Marketing campaigns, promotional discounts.                     |
+| `discountCode`    | Discount code format (example).                      | E-commerce, sales applications.                                  |
+| `accessCode`      | Generic access code format.                          | Security access, authentication systems.                         |
+| `pinCode`         | PIN code format (generic 4-8 digits).               | Security verification, access control.                            |
+| `otpCode`         | OTP (One-Time Password) format (generic 6 digits).  | Two-factor authentication, secure transactions.                 |
+| `verificationCode`| Verification code format (generic 6-8 alphanumeric). | Account verification, security processes.                       |
+| `accountNumber`   | Account number format (generic).                     | Financial applications, banking systems.                         |
+| `iban`            | IBAN (International Bank Account Number).           | International banking, financial transactions.                   |
+| `swiftCode`       | SWIFT/BIC code.                                    | International banking, банковские transfers.                   |
+| `taxId`           | Tax ID format (generic).                             | Financial forms, tax compliance.                                  |
+| `registrationNumber`| Registration number format (generic).              | Business registration, legal documents.                           |
+| `membershipId`    | Membership ID format (generic).                      | Membership management systems, loyalty programs.                 |
+| `referenceNumber` | Reference number format (generic).                   | General purpose tracking and identification.                    |
+| `applicationId`   | Application ID format (generic).                     | Application tracking, system logs.                              |
+| `confirmationCode`| Confirmation code format (generic).              | Transaction confirmations, system responses.                    |
+| `authorizationCode`| Authorization code format (generic).              | Payment processing, security authorizations.                    |
+| `transactionId`   | Transaction ID format (generic).                     | E-commerce, financial transaction tracking.                     |
+| `paymentReference`| Payment reference format (generic).                 | Billing systems, payment tracking.                              |
+| `bookingNumber`   | Booking number format (generic).                     | Reservation systems, appointment booking.                       |
+| `enrollmentKey`   | Enrollment key format (generic).                     | System enrollment, device provisioning.                           |
+| `activationCode`  | Activation code format (generic).                    | Software activation, product licensing.                           |
+| `unlockCode`      | Unlock code format (generic).                        | Device unlocking, access recovery.                                |
+| `accessKey`       | Access key format (generic).                         | API access, secure system entry.                                 |
+| `secretKey`       | Secret key format (generic).                         | API keys, security credentials.                                  |
+
 
 ### Number Patterns
 
@@ -394,7 +463,7 @@ Here's a table summarizing the available validators and their common use cases:
 | `longitude`      | Longitude coordinates (-180 to +180 degrees). | Location data input, mapping applications.           |
 | `postalCode`     | Generic alphanumeric postal codes.             | Address forms (for countries not specifically covered). |
 | `countryCode`    | 2-letter uppercase ISO country codes.        | Country selection, address forms.                     |
-| `currencySymbol` | Common currency symbols ($, €, £, ¥).           | Currency input, financial forms.                        |
+| `currencySymbol` | Common currency symbols ($, €, £, ¥, ₹).         | Currency input, financial forms, now includes Indian Rupee.                        |
 
 ### Social Media/Online Patterns
 
@@ -428,5 +497,6 @@ Here's a table summarizing the available validators and their common use cases:
 | `yearMonth`              | Year-Month format (YYYY-MM).                   | Date ranges, reporting periods.                             |
 | `monthDay`               | Month-Day format (MM-DD).                     | Recurring events, date templates.                           |
 | `timeMilliseconds`       | Time with milliseconds (HH:MM:SS.mmm).         | Precise time logging, performance measurements.             |
+
 
 **Remember**: While these regex validators are helpful, always consider the specific requirements of your application and user base. You may need to adjust or extend these patterns for optimal validation. You can also create completely custom regex patterns and use them with ForgeForm.
