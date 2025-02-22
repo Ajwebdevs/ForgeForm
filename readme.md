@@ -2,37 +2,55 @@
 
 **Lightweight, TypeScript-First Form Validation for Modern Web Applications**
 
-ForgeForm is a powerful and intuitive form validation library built with TypeScript for robust web application development. It simplifies form validation with its declarative schema definition, comprehensive validation engine, React hook for easy form state management, and a rich regex builder.
+ForgeForm is a powerful and intuitive form validation library built with TypeScript for robust web application development. It simplifies form validation with its declarative schema definition, comprehensive validation engine, React integration for easy form state management, and a rich regex builder.
 
-## Features
+## 🔗 Links  
 
-*   **Intuitive DSL (Domain Specific Language):**
-    *   Define form schemas effortlessly using `createSchema` with a clean, JSON-like syntax.
-    *   Supports a wide range of field types: `string`, `number`, `boolean`, `email`, `url`, and more.
-    *   Handles complex data structures including nested `objects` and `arrays`.
-    *   Offers advanced type support: `union`, `literal`, `tuple`, and `record` types.
+- **Live Demo**: [ForgeForm Web Demo](https://forge-form-web-demo.vercel.app/)  
+- **GitHub Repository**: [Ajwebdevs/ForgeForm](https://github.com/Ajwebdevs/ForgeForm)  
+- **NPM Package**: [ForgeForm on NPM](https://www.npmjs.com/package/forgeform)  
 
-*   **Robust Core Validation Engine:**
-    *   **Type-Safe Validation:** Ensures data adheres to the expected types defined in your schema.
-    *   **Built-in Sanitization:** Automatically sanitizes string inputs by trimming whitespace and converting case (lowercase or uppercase) based on your schema configuration.
-    *   **Regex/Format Validation:** Leverages a comprehensive regex builder with over 50 RCN (Reusable, Community-Driven, and Node.js-friendly) compliant regex patterns for robust format validation.
-    *   **Custom Validators:**  Easily extend validation logic with synchronous or asynchronous custom validators to handle complex business rules.
-    *   **Customizable Error Messages:**  Define tailored error messages and error codes for each validation rule, enhancing user feedback and application localization.
+---
+![GitHub Repo Stars](https://img.shields.io/github/stars/Ajwebdevs/ForgeForm?style=social)
+![NPM Downloads](https://img.shields.io/npm/dt/forgeform)
+## ✨ Features  
 
-*   **React Hook (`useForm`):**
-    *   Simplifies form state management in React applications.
-    *   Manages form data and validation errors seamlessly.
-    *   Handles nested form fields effortlessly using dot-notation in field names (e.g., `"address.street"`).
-    *   Provides real-time validation feedback to users, improving form usability.
+### ✅ Intuitive DSL (Domain Specific Language)  
+- Define form schemas effortlessly using `createSchema` with a clean, JSON-like syntax.  
+- Supports a wide range of field types: `string`, `number`, `boolean`, `email`, `url`, and more.  
+- Handles complex data structures including nested `objects` and `arrays`.  
+- Offers advanced type support: `union`, `literal`, `tuple`, and `record` types.  
 
-*   **Comprehensive Regex Builder:**
-    *   Includes a vast collection of over 50 pre-built, RCN-compliant regex patterns.
-    *   Covers common data formats like `email`, `phone`, `url`, `uuid`, `zip`, `ip`, `date`, `time`, `creditCard`, `color`, and many more.
-    *   Offers complex validation patterns for scenarios like semantic versioning, social media handles, and various postal code formats.
-    *   Allows for custom regex creation using the `buildRegex` function, providing flexibility for specific validation needs.
+### ⚡ Robust Core Validation Engine  
+- **Type-Safe Validation**: Ensures data adheres to the expected types defined in your schema.  
+- **Built-in Sanitization**: Trims whitespace and converts case (lowercase or uppercase) automatically.  
+- **Regex/Format Validation**: Leverages over 50 RCN-compliant regex patterns.  
+- **Custom Validators**: Supports synchronous and asynchronous validation.  
+- **Customizable Error Messages**: Define tailored error messages for better user feedback.  
 
-*   **Extensibility & Customization:**
-    *   Designed for extensibility, allowing you to easily extend or override built-in validators, sanitizers, and regex patterns to match your application's specific requirements.
+### 🎯 Seamless Integration with React Hook Form  
+ForgeForm seamlessly integrates with React Hook Form for easy form state management.  
+
+#### Example Usage:  
+```typescript
+import { forgeFormResolver } from 'forgeform';
+import { useForm } from 'react-hook-form';
+```
+
+### 🏗️ React Form State Management  
+- Simplifies form state management within React applications.  
+- Manages form data and validation errors seamlessly.  
+- Handles nested form fields using dot-notation (e.g., `"address.street"`).  
+- Provides real-time validation feedback to users.  
+
+### 🔍 Comprehensive Regex Builder  
+- Includes over 50 pre-built, RCN-compliant regex patterns.  
+- Supports validation formats such as `email`, `phone`, `url`, `uuid`, `zip`, `ip`, `date`, `time`, `creditCard`, `color`, and more.  
+- Allows for custom regex creation using the `buildRegex` function.  
+
+### 🔧 Extensibility & Customization  
+- Easily extend or override built-in validators, sanitizers, and regex patterns.  
+
 
 ## Installation
 
@@ -199,6 +217,95 @@ const styles: { [key: string]: React.CSSProperties } = { /* ... (styling code fr
 export default App;
 ```
 
+*   **3.Using the React Hook Form `Adapter/Resolver`**
+    *   ForgeForm also provides a custom resolver for React Hook Form. This lets you integrate ForgeForm with React Hook Form effortlessly:
+
+
+```typescript
+// following is the demo for the react-hook-forms with submission 
+
+import React from "react";
+import { useForm as useRHFForm } from "react-hook-form";
+import { createSchema, forgeFormResolver, buildRegex } from "forgeform";
+
+interface FormData {
+  email: string;
+  age: number;
+}
+
+const schema = createSchema<FormData>({
+  fields: {
+    email: {
+      type: "email",
+      required: true,
+      minLength: 5,
+      trim: true,
+      lowercase: true,
+      // Updated email regex requires at least one dot in the domain:
+      pattern: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$/.source,
+      requiredErrorMessage: "Email is required.",
+    },
+    age: {
+      type: "number",
+      required: true,
+      min: 18,
+      max: 120,
+    },
+  },
+});
+
+const RHFExample: React.FC = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useRHFForm<FormData>({
+    resolver: forgeFormResolver(schema),
+  });
+
+  const onSubmit = (data: FormData) => {
+    console.log("Form Data:", data);
+  };
+
+  return (
+    <div style={{ padding: "2rem", maxWidth: "500px", margin: "0 auto" }}>
+      <h1 style={{ textAlign: "center", marginBottom: "1rem" }}>
+        ForgeForm with React Hook Form
+      </h1>
+      <form
+        onSubmit={handleSubmit(onSubmit, (errs) => console.log("Validation Errors:", errs))}
+        style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+      >
+        <div>
+          <label htmlFor="email">Email:</label>
+          <input id="email" {...register("email")} style={{ padding: "0.5rem", width: "100%" }} />
+          {errors.email && <span style={{ color: "red" }}>{errors.email.message}</span>}
+        </div>
+        <div>
+          <label htmlFor="age">Age:</label>
+          <input id="age" type="number" {...register("age", { valueAsNumber: true })} style={{ padding: "0.5rem", width: "100%" }} />
+          {errors.age && <span style={{ color: "red" }}>{errors.age.message}</span>}
+        </div>
+        <button
+          type="submit"
+          style={{
+            padding: "0.75rem",
+            backgroundColor: "#007bff",
+            color: "#fff",
+            border: "none",
+            borderRadius: "4px",
+          }}
+        >
+          Submit
+        </button>
+      </form>
+    </div>
+  );
+};
+
+export default RHFExample;
+```
+
 ### Complex Validation
 The demo form showcases complex validation rules:
 
@@ -206,9 +313,35 @@ The demo form showcases complex validation rules:
 - **Password Fields**: `confirmPassword` uses a custom validator to ensure it matches the password field.
 - **Age Field**: Restricts input to numbers between 18 and 120.
 - **ZIP Code Field**: Utilizes the built-in zip regex pattern from the regex builder for format validation.
+- **Over 100+ Regex vals**: Discover over 100 pre-built out of the box regex soloution to be directly used wihtin the formSchema
 
 ### Built-In Sanitization
 Sanitization rules defined in the schema (trim, lowercase) are automatically applied by the core validation engine before validation occurs.
+
+**Intelligent Type Coercion in `applySanitizers`**
+
+To address this, ForgeForm's `applySanitizers` function has been updated with enhanced logic to automatically coerce string inputs into the data types defined in your schema. This ensures that validation and subsequent data handling are performed on correctly typed data, even when the initial input is a string.
+
+The enhanced `applySanitizers` function now includes the following type coercion capabilities:
+
+*   **Numeric Types (`number`, `integer`, `float`):**
+    If a field is defined as a numeric type and receives a string value, ForgeForm will attempt to parse the string into a number using `Number()`.
+    -   If the string can be successfully parsed into a number, the sanitized value will be the parsed number.
+    -   If the string cannot be parsed into a valid number (e.g., "abc"), ForgeForm will issue a warning to the console and use the field's `default` value if specified in the schema. If no default is provided, the value will be set to `undefined`.
+
+*   **Boolean Types (`boolean`, `checkbox`):**
+    For boolean fields receiving string inputs, ForgeForm will intelligently interpret common string representations of boolean values:
+    -   Strings `"true"` or `"on"` (case-insensitive) will be coerced to `true`.
+    -   Strings `"false"` or `"off"` (case-insensitive) will be coerced to `false`.
+    -   If the string does not match these boolean representations, a console warning will be issued, and the field's `default` value will be used if provided in the schema. Otherwise, the value will be set to `undefined`.
+    -   If the input value is not a string but also not already a boolean, it will be coerced to a boolean using `!!value` (double negation for truthiness).
+
+*   **Date Types (`date`, `datetime-local`, `date-only`, `time-only`, `month-only`, `week-only`):**
+    When a field is defined as a date type and receives a string, ForgeForm will attempt to parse the string into a Date object.
+    -   It first tries parsing the string as an ISO date using `parseISO` from `date-fns`.
+    -   If ISO parsing fails, it falls back to standard JavaScript `Date` constructor parsing (`new Date(sanitizedValue)`).
+    -   If either parsing method results in a valid Date object, the sanitized value will be the Date object.
+    -   If date parsing fails, a console warning will be logged, and the field's `default` value will be used if defined in the schema. If no default is specified, the value becomes `undefined`.
 
 ### Error Display
 Validation errors, if any, are displayed inline below their respective input fields, providing immediate feedback to the user.

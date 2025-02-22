@@ -1,6 +1,6 @@
 {
   "name": "forgeform",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
@@ -12,7 +12,14 @@
     "build": "tsc",
     "test": "echo \"No tests yet\""
   },
-  "keywords": ["form", "validation", "typescript", "react", "regex", "sanitization"],
+  "keywords": [
+    "form",
+    "validation",
+    "typescript",
+    "react",
+    "regex",
+    "sanitization"
+  ],
   "author": "Arjun S. Nair <5minutepodcastforyou@gmail.com>",
   "license": "ISC",
   "description": "A lightweight, TypeScript-first form validation library with an intuitive DSL, built-in sanitization, custom error messages, a React hook, and a comprehensive regex builder.",
@@ -27,7 +34,9 @@
   },
   "dependencies": {
     "ajv": "^8.17.1",
+    "date-fns": "^4.1.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.54.2"
   }
 }

@@ -1,7 +1,21 @@
+import { parseISO, isValid } from "date-fns";
 /* Apply built‑in sanitizers for string values. */
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
 function applySanitizers(fieldSchema, value) {
     let sanitizedValue = value;
+    const stringTypes = [
+        "string",
+        "email",
+        "password",
+        "url",
+        "uuid",
+        "textarea",
+        "tel",
+        "select",
+        "radio",
+        "checkbox",
+        "color",
+    ];
     if (typeof sanitizedValue === 'string') {
         if (fieldSchema.trim) {
             sanitizedValue = sanitizedValue.trim();
@@ -12,6 +26,72 @@ function applySanitizers(fieldSchema, value) {
         if (fieldSchema.uppercase) {
             sanitizedValue = sanitizedValue.toUpperCase();
         }
+    }
+    const numericType = ["number", "integer", "float"];
+    if (numericType.includes(fieldSchema.type)) {
+        if (typeof sanitizedValue === "string") {
+            const Parsed = Number(sanitizedValue);
+            // biome-ignore lint/suspicious/noGlobalIsNan: <explanation>
+            if (!isNaN(Parsed)) {
+                sanitizedValue = Parsed;
+            }
+            else {
+                console.warn(`[ForgeForm Sanitize]: Could not parse string "${value}" to a number for field type "${fieldSchema.type}". Using default if available.`);
+                sanitizedValue = fieldSchema.default !== undefined ? fieldSchema.default : undefined;
+            }
+        }
+    }
+    const booleanTypes = ["boolean", "checkbox"];
+    if (booleanTypes.includes(fieldSchema.type)) {
+        if (typeof sanitizedValue === "string") {
+            const lowerCaseValue = sanitizedValue.toLowerCase();
+            if (lowerCaseValue === "true" || lowerCaseValue === "on") {
+                sanitizedValue = true;
+            }
+            else if (lowerCaseValue === "false" || lowerCaseValue === "off") {
+                sanitizedValue = false;
+            }
+            else {
+                console.warn(`[ForgeForm Sanitize]: Could not parse string "${value}" to a boolean for field type "${fieldSchema.type}". Using default if available.`);
+                sanitizedValue = fieldSchema.default !== undefined ? fieldSchema.default : undefined;
+            }
+        }
+        else if (typeof sanitizedValue !== "boolean") {
+            sanitizedValue = !!sanitizedValue;
+        }
+    }
+    const dateTypes = ["date", "datetime-local", "date-only", "time-only", "month-only", "week-only"];
+    if (dateTypes.includes(fieldSchema.type)) {
+        if (typeof sanitizedValue === "string") {
+            let dateObj = parseISO(sanitizedValue);
+            if (!isValid(dateObj)) {
+                // Fall back to standard Date parsing if ISO fails
+                dateObj = new Date(sanitizedValue);
+            }
+            if (isValid(dateObj)) {
+                sanitizedValue = dateObj;
+            }
+            else {
+                console.warn(`[ForgeForm Sanitize]: Could not parse string "${value}" to a valid date for field type "${fieldSchema.type}". Using default if available.`);
+                sanitizedValue = fieldSchema.default !== undefined ? fieldSchema.default : undefined;
+            }
+        }
+    }
+    if (fieldSchema.type === "array" && Array.isArray(sanitizedValue) && fieldSchema.elementType) {
+        sanitizedValue = sanitizedValue.map((item) => 
+        // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+        applySanitizers(fieldSchema.elementType, item));
+    }
+    if (fieldSchema.type === "object" && typeof sanitizedValue === "object" && sanitizedValue !== null && fieldSchema.schema) {
+        // Iterate over each defined field in the nested schema.
+        const nestedFields = fieldSchema.schema.fields;
+        // biome-ignore lint/complexity/noForEach: <explanation>
+        Object.keys(nestedFields).forEach((key) => {
+            // biome-ignore lint/suspicious/noPrototypeBuiltins: <explanation>
+            if (sanitizedValue.hasOwnProperty(key)) {
+                sanitizedValue[key] = applySanitizers(nestedFields[key], sanitizedValue[key]);
+            }
+        });
     }
     if (fieldSchema.sanitize) {
         sanitizedValue = fieldSchema.sanitize(sanitizedValue);
