@@ -1,11 +1,19 @@
 {
   "name": "forgeform",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
   "files": [
-    "dist",
+    "dist/backend",
+    "dist/core",
+    "dist/dsl",
+    "dist/hooks",
+    "dist/regexBuilder",
+    "dist/resolver",
+    "dist/types",
+    "dist/index.d.ts",
+    "dist/index.js",
     "readme.md"
   ],
   "scripts": {

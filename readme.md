@@ -15,6 +15,39 @@ ForgeForm is a powerful and intuitive form validation library built with TypeScr
 ![NPM Downloads](https://img.shields.io/npm/dt/forgeform)
 ## ✨ Features  
 
+### 🧙‍♂️ Wizard Forms (New in v1.3.0)  
+ForgeForm now includes a powerful **Wizard Forms** feature, enabling multi-step forms with state persistence, validation, and lifecycle hooks.
+
+#### Key Features:
+- **Step Identifiers**: Assign unique `id` to each step.
+- **Granular Validation**: Validate each step independently.
+- **Lifecycle Callbacks**: Handle step changes, validation success, errors, and form completion.
+- **Progress Tracking & State Persistence**: Track user progress and restore state if needed.
+
+#### Example Usage:
+* (more detailed version below scroll to the wizard section)
+```typescript
+import { createWizard, createSchema } from 'forgeform';
+
+const steps = [
+  {
+    id: 'step1',
+    schema: createSchema({ name: 'string.required' }),
+  },
+  {
+    id: 'step2',
+    schema: createSchema({ email: 'string.email.required' }),
+  },
+];
+
+const wizard = createWizard(steps);
+
+wizard.nextStep({ name: 'John Doe' })
+  .then(() => wizard.nextStep({ email: 'john@example.com' }))
+  .then(() => console.log('Wizard completed!'))
+  .catch(error => console.error(error));
+```
+
 ### ✅ Intuitive DSL (Domain Specific Language)  
 - Define form schemas effortlessly using `createSchema` with a clean, JSON-like syntax.  
 - Supports a wide range of field types: `string`, `number`, `boolean`, `email`, `url`, and more.  
@@ -52,6 +85,16 @@ import { useForm } from 'react-hook-form';
 - Easily extend or override built-in validators, sanitizers, and regex patterns.  
 
 
+## 🆕 Changelog  
+
+### [1.3.0] - (Latest)  
+- **New Feature:** Introduced **Wizard Forms**, allowing multi-step forms with validation and state persistence.  
+- **New Feature:** Added `Wizard` class for creating wizards with step tracking, progress monitoring, and lifecycle callbacks.  
+
+### [1.2.0]  
+- **New Feature:** Introduced `forgeFormResolver`, which provides an easy-to-use resolver for **React Hook Form** integration.  
+
+
 ## Installation
 
 Install ForgeForm using npm or yarn:
@@ -63,7 +106,229 @@ npm install forgeform
 yarn add forgeform
 ```
 
-## Usage
+# Wizard Forms in ForgeForm (Beta v1.0.0)
+
+ForgeForm now includes a robust **Wizard Forms** feature that allows you to build multi‑step forms with granular validation, progress tracking, state persistence, and lifecycle hooks. This guide explains how to create and use a wizard, what features it provides, and how to handle errors.
+
+## Overview
+
+The Wizard Forms feature enables you to:
+- **Divide your form into multiple steps**, each with its own validation schema.
+- **Assign unique identifiers** to each step for non‑linear navigation.
+- **Track progress** and maintain a record of which steps are completed.
+- **Persist and restore state** for lengthy forms.
+- **Receive granular error details** for each step.
+- **Leverage lifecycle callbacks** to trigger actions during step changes, validation success, validation errors, and form completion.
+
+## Features
+
+- **Step Identifiers:**  
+  Each step is defined with a required unique `id` so you can easily reference and navigate between steps.
+
+- **Granular Validation:**  
+  Each step is validated against its own schema. Validation results (including field‑specific errors) are stored in `stepResults`.
+
+- **Lifecycle Callbacks:**  
+  - `onStepChange`: Triggered whenever the current step changes.
+  - `onValidationSuccess`: Called when a step validates successfully.
+  - `onValidationError`: Called when a step fails validation.
+  - `onComplete`: Called when the final step validates successfully and the wizard is complete.
+
+- **Progress Tracking & State Persistence:**  
+  Use `getProgress()` to obtain the current completion percentage and `getState()` to retrieve the wizard’s current state for saving or restoration.
+
+- **Robust Error Handling:**  
+  Custom error classes (`WizardError`, `WizardValidationError`, and `SchemaError`) ensure that errors are descriptive and easily distinguishable.
+
+## Installation
+
+Ensure you have ForgeForm installed:
+
+```bash
+npm install forgeform
+```
+
+## API Reference
+
+### `createWizard(steps, initialData, options)`
+
+#### Parameters:
+- `steps`: An array of wizard steps, where each step is an object with a required `id` and a schema (created using `createSchema()`).
+- `initialData` (optional): A partial data object for initializing the form.
+- `options` (optional): Lifecycle callback functions.
+
+#### Returns:
+An instance of the `Wizard` class.
+
+## Wizard Class Methods
+
+### `validateCurrentStep(): Promise<ValidationResult<T>>`
+Validates the current step using its schema and stores field‑specific errors.
+
+### `nextStep(stepData: Partial<T>): Promise<boolean>`
+Merges current step data and, if valid, moves to the next step. Returns `true` if the step is validated successfully.
+
+### `previousStep(): void`
+Moves back one step.
+
+### `goToStep(stepId: string): void`
+Jumps to a specific step using its unique identifier.
+
+### `getProgress(): number`
+Returns the current progress percentage (from 0 to 100).
+
+### `getState(): { currentStepId: string; currentStepIndex: number; data: Partial<T>; completedSteps: boolean[] }`
+Returns the current state of the wizard, useful for persistence.
+
+### `reset(): void`
+Resets the wizard to its initial state.
+
+## Error Handling
+
+- `WizardError` is the base error class for any wizard-related issues.
+- `WizardValidationError` is thrown when a step fails validation.
+- `SchemaError` is thrown during wizard setup if there are schema issues (e.g., missing or duplicate step IDs).
+
+## Example Code (3 step form)
+
+```typescript
+// src/components/SimpleWizardFormDemo.tsx
+import React, { useState, useEffect, useMemo } from "react";
+import { createSchema, createWizard } from "forgeform"; // Adjust import path as necessary
+
+// 1. Define data type for the simple wizard
+interface SimpleWizardData {
+    name?: string;
+    email?: string;
+    message?: string;
+}
+
+// 2. Define schemas for each of the 3 steps (simplified)
+const step1Schema = createSchema<SimpleWizardData>({
+    fields: {
+        name: { type: "string", required: true, minLength: 2, requiredErrorMessage: "Name is required" },
+    },
+});
+
+const step2Schema = createSchema<SimpleWizardData>({
+    fields: {
+        email: { type: "email", required: true, requiredErrorMessage: "Email is required", formatErrorMessage: "Invalid email" },
+    },
+});
+
+const step3Schema = createSchema<SimpleWizardData>({
+    fields: {
+        message: { type: "textarea", required: true, minLength: 10, maxLength: 200, requiredErrorMessage: "Message is required", maxLengthErrorMessage: "Message too long" },
+    },
+});
+
+// 3. Simple WizardFormDemo Component
+const SimpleWizardFormDemo: React.FC = () => {
+    // Track current step index in React state
+    const [currentStepIndexState, setCurrentStepIndexState] = useState<number>(0);
+    // Local state for form data
+    const [formData, setFormData] = useState<SimpleWizardData>({});
+
+    // Create wizard instance using useMemo for efficiency
+    const wizard = useMemo(() =>
+        createWizard<SimpleWizardData>(
+            [
+                { id: "step-name", schema: step1Schema },
+                { id: "step-email", schema: step2Schema },
+                { id: "step-message", schema: step3Schema },
+            ],
+            {}, // Initial data
+            {
+                onStepChange: (_, index) => setCurrentStepIndexState(index), // Update step index state
+                onComplete: (finalData) => console.log("Simple Wizard Completed:", finalData), // Log final data
+            }
+        ), []
+    );
+
+    // Generic input change handler
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setFormData(prevData => ({ ...prevData, [name]: value }));
+    };
+
+    // Next step handler
+    const handleNext = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const success = await wizard.nextStep(formData);
+        if (success) {
+            setFormData({}); // Clear form data after step
+        } else {
+            alert("Validation errors. Please check the form.");
+        }
+    };
+
+    // Previous step handler
+    const handlePrevious = (e: React.FormEvent) => {
+        e.preventDefault();
+        wizard.previousStep();
+    };
+
+    // Submit handler for final step
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const success = await wizard.nextStep(formData);
+        if (success) {
+            alert("Simple Wizard Completed! Check console for data.");
+            setFormData({});
+            wizard.reset();
+            setCurrentStepIndexState(0); // Reset to first step
+        } else {
+            alert("Validation errors on final step.");
+        }
+    };
+
+    return (
+        <div style={{ padding: '20px', fontFamily: 'Arial' }}>
+            <h3>Simple 3-Step Wizard Demo</h3>
+            <p>Step {currentStepIndexState + 1} of 3</p>
+            <form onSubmit={currentStepIndexState === 2 ? handleSubmit : handleNext} style={{ display: 'flex', flexDirection: 'column', gap: '15px', maxWidth: '400px' }}>
+
+                {currentStepIndexState === 0 && (
+                    <div>
+                        <label htmlFor="name">Name:</label>
+                        <input type="text" id="name" name="name" value={formData.name || ''} onChange={handleInputChange} style={{ width: '100%', padding: '8px', margin: '5px 0' }} />
+                    </div>
+                )}
+
+                {currentStepIndexState === 1 && (
+                    <div>
+                        <label htmlFor="email">Email:</label>
+                        <input type="email" id="email" name="email" value={formData.email || ''} onChange={handleInputChange} style={{ width: '100%', padding: '8px', margin: '5px 0' }} />
+                    </div>
+                )}
+
+                {currentStepIndexState === 2 && (
+                    <div>
+                        <label htmlFor="message">Message:</label>
+                        <textarea id="message" name="message" value={formData.message || ''} onChange={handleInputChange} style={{ width: '100%', padding: '8px', margin: '5px 0', minHeight: '100px' }} />
+                    </div>
+                )}
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
+                    {currentStepIndexState > 0 && (
+                        <button type="button" onClick={handlePrevious} style={{ padding: '10px 15px' }}>Previous</button>
+                    )}
+                    <button type="submit" style={{ padding: '10px 15px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '5px' }}>
+                        {currentStepIndexState === 2 ? 'Submit' : 'Next'}
+                    </button>
+                </div>
+            </form>
+        </div>
+    );
+};
+
+export default SimpleWizardFormDemo;
+```
+
+
+
+
+## Usage (General Hooks and Resolver)
 
 *   **1. Defining a Schema with the DSL Parser**
     *   Designed for extensibility, allowing you to easily extend or override built-in validators, sanitizers, and regex patterns to match your application's specific requirements.

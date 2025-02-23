@@ -147,5 +147,6 @@ export interface ValidationError {
 export interface ValidationResult<T extends Record<string, any> = Record<string, any>> {
   success: boolean;
   errors: { [K in keyof T]?: ValidationError };
+  baseError?: string;
   data?: T;
 }
